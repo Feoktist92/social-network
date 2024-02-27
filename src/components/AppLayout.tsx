@@ -10,48 +10,24 @@ import {
 } from '@ant-design/icons';
 import UserProfile from './UserProfile';
 import { useState, useEffect } from 'react';
-import NewsFeed from './NewsFeed';
-import type { MenuProps } from 'antd';
 import userStore from '../stores/UserStore';
 import { observer } from 'mobx-react-lite';
 import FriendList from './FriendList';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes, useLocation } from 'react-router-dom';
 import MessageList from './MessageList';
 import UserList from './UserList';
+import NewsFeed from './NewsFeed';
 
-
-type MenuItem = Required<MenuProps>['items'][number];
 const { Header, Sider, Content } = Layout;
-const { Title } = Typography
-
-function getItem(
-    label: React.ReactNode,
-    key: React.Key,
-    icon?: React.ReactNode,
-    children?: MenuItem[],
-    type?: 'group',
-): MenuItem {
-    return {
-        key,
-        icon,
-        children,
-        label,
-        type,
-    } as MenuItem;
-}
-
-const items: MenuItem[] = [
-    getItem('Профиль', '1', <Link to="/profile"><UserOutlined /> </Link>),
-    getItem('Новости', '2', <Link to="/news-feed"><AppstoreOutlined /> </Link>),
-    getItem('Пользователи', '3', <Link to="/users"><UsergroupAddOutlined /> </Link>),
-    getItem('Друзья', '4', <Link to="/friends"><TeamOutlined /> </Link>),
-    getItem('Сообщения', '5', <Link to="/messages"><MessageOutlined /> </Link>),
-];
+const { Title } = Typography;
 
 const AppLayout = observer(() => {
     const { logout } = userStore;
-    const [selectedMenuItem, setSelectedMenuItem] = useState<string>();
     const [isMobile, setIsMobile] = useState<boolean>(false);
+    const { pathname } = useLocation();
+
+    // Установка selectedMenuItem на основе пути
+    const selectedMenuItem = pathname.substring(1);
 
     useEffect(() => {
         const handleResize = () => {
@@ -66,15 +42,9 @@ const AppLayout = observer(() => {
         };
     }, []);
 
-    const handleMenuClick = ({ key }: { key: React.Key }) => {
-        setSelectedMenuItem(key?.toString() ?? '');
-    };
-
-
-
     return (
         <>
-            <Header className='header' >
+            <Header className='header'>
                 <Title style={{ color: 'white', margin: 0 }} level={3}>
                     Социальная сеть{' '}
                     <UserSwitchOutlined />
@@ -82,14 +52,19 @@ const AppLayout = observer(() => {
                 <Link className="logout-button" to="/">
                     <LogoutOutlined color='primary' onClick={logout} />
                 </Link>
-
             </Header>
             <Layout style={{ minHeight: '100vh' }}>
                 <Sider
                     width={isMobile ? 68 : 200}
                     collapsedWidth="0"
                 >
-                    <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} onClick={handleMenuClick} />
+                    <Menu theme="dark" mode="inline" selectedKeys={[selectedMenuItem]} items={[
+                        { key: 'profile', icon: <UserOutlined />, label: <Link to="/profile">Профиль</Link> },
+                        { key: 'news-feed', icon: <AppstoreOutlined />, label: <Link to="/news-feed">Новости</Link> },
+                        { key: 'users', icon: <UsergroupAddOutlined />, label: <Link to="/users">Пользователи</Link> },
+                        { key: 'friends', icon: <TeamOutlined />, label: <Link to="/friends">Друзья</Link> },
+                        { key: 'messages', icon: <MessageOutlined />, label: <Link to="/messages">Сообщения</Link> },
+                    ]} />
                 </Sider>
                 <Layout className="site-layout">
                     <Content className="site-layout__content">
