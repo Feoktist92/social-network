@@ -41,16 +41,15 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-    getItem('Профиль', '1', <Link to="/profile"><UserOutlined /></Link>),
-    getItem('Новости', '2', <Link to="/news-feed"><AppstoreOutlined /></Link>),
-    getItem('Пользователи', '3', <Link to="/users"><UsergroupAddOutlined /></Link>),
-    getItem('Друзья', '4', <Link to="/friends"><TeamOutlined /></Link>),
-    getItem('Сообщения', '5', <Link to="/messages"><MessageOutlined /></Link>),
+    getItem('Профиль', '1', <Link to="/profile"><UserOutlined /> </Link>),
+    getItem('Новости', '2', <Link to="/news-feed"><AppstoreOutlined /> </Link>),
+    getItem('Пользователи', '3', <Link to="/users"><UsergroupAddOutlined /> </Link>),
+    getItem('Друзья', '4', <Link to="/friends"><TeamOutlined /> </Link>),
+    getItem('Сообщения', '5', <Link to="/messages"><MessageOutlined /> </Link>),
 ];
 
 const AppLayout = observer(() => {
     const { logout } = userStore;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [selectedMenuItem, setSelectedMenuItem] = useState<string>();
     const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -90,7 +89,6 @@ const AppLayout = observer(() => {
                     width={isMobile ? 68 : 200}
                     collapsedWidth="0"
                 >
-                    <div className="logo" />
                     <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} onClick={handleMenuClick} />
                 </Sider>
                 <Layout className="site-layout">
