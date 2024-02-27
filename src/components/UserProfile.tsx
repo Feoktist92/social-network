@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import userStore from '../stores/UserStore/UserStore';
+import userStore from '../stores/UserStore';
 import { useState } from 'react';
 import { Avatar, Input, Button, message } from 'antd';
 

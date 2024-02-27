@@ -12,12 +12,13 @@ import UserProfile from './UserProfile';
 import { useState, useEffect } from 'react';
 import NewsFeed from './NewsFeed';
 import type { MenuProps } from 'antd';
-import userStore from '../stores/UserStore/UserStore';
+import userStore from '../stores/UserStore';
 import { observer } from 'mobx-react-lite';
 import FriendList from './FriendList';
-import { Link } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import MessageList from './MessageList';
 import UserList from './UserList';
+
 
 type MenuItem = Required<MenuProps>['items'][number];
 const { Header, Sider, Content } = Layout;
@@ -40,15 +41,16 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-    getItem('Профиль', '1', <UserOutlined />),
-    getItem('Лента новостей', '2', <AppstoreOutlined />),
-    getItem('Пользователи', '3', <TeamOutlined />),
-    getItem('Друзья', '4', <UsergroupAddOutlined />),
-    getItem('Сообщения', '5', <MessageOutlined />),
+    getItem('Профиль', '1', <Link to="/profile"><UserOutlined /></Link>),
+    getItem('Новости', '2', <Link to="/news-feed"><AppstoreOutlined /></Link>),
+    getItem('Пользователи', '3', <Link to="/users"><UsergroupAddOutlined /></Link>),
+    getItem('Друзья', '4', <Link to="/friends"><TeamOutlined /></Link>),
+    getItem('Сообщения', '5', <Link to="/messages"><MessageOutlined /></Link>),
 ];
 
 const AppLayout = observer(() => {
     const { logout } = userStore;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [selectedMenuItem, setSelectedMenuItem] = useState<string>();
     const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -69,26 +71,7 @@ const AppLayout = observer(() => {
         setSelectedMenuItem(key?.toString() ?? '');
     };
 
-    let content;
-    switch (selectedMenuItem) {
-        case '1':
-            content = <UserProfile />;
-            break;
-        case '2':
-            content = <NewsFeed />;
-            break;
-        case '3':
-            content = <UserList />;
-            break;
-        case '4':
-            content = <FriendList />;
-            break;
-        case '5':
-            content = <MessageList />;
-            break;
-        default:
-            content = <UserProfile />;
-    }
+
 
     return (
         <>
@@ -112,7 +95,13 @@ const AppLayout = observer(() => {
                 </Sider>
                 <Layout className="site-layout">
                     <Content className="site-layout__content">
-                        {content}
+                        <Routes>
+                            <Route path="/profile" element={<UserProfile />} />
+                            <Route path="/news-feed" element={<NewsFeed />} />
+                            <Route path="/users" element={<UserList />} />
+                            <Route path="/friends" element={<FriendList />} />
+                            <Route path="/messages" element={<MessageList />} />
+                        </Routes>
                     </Content>
                 </Layout>
             </Layout>

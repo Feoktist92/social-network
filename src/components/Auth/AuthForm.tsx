@@ -4,11 +4,17 @@ import { Form, Input, Button, message } from 'antd';
 import { LockOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { API_URL } from '../../api/api';
-import userStore from '../../stores/UserStore/UserStore';
+import userStore from '../../stores/UserStore';
+import { useNavigate } from 'react-router-dom';
 
-const AuthForm: React.FC<{ type: 'register' | 'login'; switchTab: () => void }> = observer(({ type, switchTab }) => {
+interface AuthFormProps {
+    type: 'register' | 'login';
+}
+
+const AuthForm: React.FC<AuthFormProps> = observer(({ type }) => {
     const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
+    const navigate = useNavigate();
 
     const onFinish = async (values: FormData) => {
         setLoading(true);
@@ -23,9 +29,7 @@ const AuthForm: React.FC<{ type: 'register' | 'login'; switchTab: () => void }> 
                 const successMessage = type === 'register' ? 'Регистрация прошла успешно!' : 'Вход прошел успешно!';
                 message.success(successMessage);
                 form.resetFields();
-                if (type === 'register') {
-                    switchTab();
-                }
+                navigate('/profile');
             }
         } catch (error) {
             console.error('Error:', error);

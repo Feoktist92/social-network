@@ -1,19 +1,17 @@
 import { observer } from 'mobx-react-lite';
 import AuthTabs from './components/Auth/AuthTabs';
-import userStore from './stores/UserStore/UserStore';
-import AppLayout from './components/Layout';
+import userStore from './stores/UserStore';
 import { Route, Routes } from 'react-router-dom';
+import AppLayout from './components/AppLayout';
 
 
 
 const App = observer(() => {
   const { loggedIn } = userStore;
   return (
-    <div className='App'>
-      <Routes>
-        <Route path="/" element={loggedIn ? <AppLayout /> : <AuthTabs />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="*" element={loggedIn ? <AppLayout /> : <AuthTabs />} />
+    </Routes>
   );
 });
 

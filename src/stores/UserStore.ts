@@ -1,7 +1,7 @@
-import { makeAutoObservable } from 'mobx';
-import { Message, User } from '../../types';
+import { makeAutoObservable, runInAction } from 'mobx';
+import { Message, User } from '../types';
 import axios from 'axios';
-import { API_URL } from '../../api/api';
+import { API_URL } from '../api/api';
 
 class UserStore {
     user: User | null = null;
@@ -13,6 +13,7 @@ class UserStore {
         this.checkUser();
     }
 
+    // Метод для установки пользователя в localStorage
     setUser = (user: User) => {
         this.user = user;
         this.loggedIn = true;
@@ -20,6 +21,7 @@ class UserStore {
         localStorage.setItem('user', JSON.stringify(user));
     };
 
+    // Метод для выхода пользователя
     logout = () => {
         this.user = null;
         this.loggedIn = false;
@@ -27,6 +29,7 @@ class UserStore {
         localStorage.removeItem('user');
     };
 
+    // Метод для проверки токена
     checkToken = () => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -34,6 +37,7 @@ class UserStore {
         }
     };
 
+    // Метод для проверки авторизованного пользователя
     checkUser = () => {
         const user = localStorage.getItem('user');
         if (user) {
@@ -41,21 +45,25 @@ class UserStore {
         }
     };
 
+    // Метод для обновления аватара пользователя по ID
     updateUserAvatar = async (id: number, avatar: string) => {
         try {
             const response = await axios.patch(`${API_URL}/users/${id}`, {
                 avatar,
             });
-            const updatedUser = response.data;
-            this.user = updatedUser;
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-            return updatedUser;
+            runInAction(() => {
+                const updatedUser = response.data;
+                this.user = updatedUser;
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                return updatedUser;
+            });
         } catch (error) {
             console.error('Error updating user avatar:', error);
             throw new Error('Failed to update user avatar');
         }
     };
 
+    // Метод для добавления друга по ID
     addFriend = async (userId: number, friendId: number) => {
         try {
             const response = await axios.get(`${API_URL}/users/${userId}`);
@@ -69,19 +77,19 @@ class UserStore {
             const isFriendExists = user.friends.some(
                 (friend: User) => friend.id === friendId
             );
+
             if (!isFriendExists) {
-                // Добавляем друга в массив друзей
                 const friendResponse = await axios.get(
                     `${API_URL}/users/${friendId}`
                 );
                 const friend = friendResponse.data;
                 user.friends.push(friend);
 
-                // Обновляем пользователя на сервере
                 await axios.patch(`${API_URL}/users/${userId}`, user);
 
-                // Обновляем данные пользователя в хранилище
-                this.user = user;
+                runInAction(() => {
+                    this.user = user;
+                });
                 localStorage.setItem('user', JSON.stringify(user));
             } else {
                 throw new Error('Friend with the same ID already exists');
@@ -92,13 +100,12 @@ class UserStore {
         }
     };
 
-    // В вашем файле UserStore.ts
+    // Метод для удаления друга по ID
     removeFriend = async (userId: number, friendId: number) => {
         try {
             const response = await axios.get(`${API_URL}/users/${userId}`);
             const user = response.data;
 
-            // Проверяем, существует ли у пользователя массив друзей
             if (!user.friends) {
                 throw new Error('User has no friends to remove');
             }
@@ -108,11 +115,12 @@ class UserStore {
                 (friend: User) => friend.id !== friendId
             );
 
-            // Обновляем пользователя на сервере
             await axios.patch(`${API_URL}/users/${userId}`, user);
 
-            // Обновляем данные пользователя в хранилище
-            this.user = user;
+            runInAction(() => {
+                this.user = user;
+            });
+
             localStorage.setItem('user', JSON.stringify(user));
         } catch (error) {
             console.error('Error removing friend:', error);
@@ -120,15 +128,15 @@ class UserStore {
         }
     };
 
+    // Метод для отправки сообщения
     sendMessage = async (
         senderId: number,
         receiverId: number,
         content: string
     ) => {
         try {
-            // Создаем сообщение
             const message: Message = {
-                id: Date.now(), // временное решение для генерации ID
+                id: Date.now(),
                 senderId: senderId,
                 receiverId: receiverId,
                 content: content,
@@ -146,29 +154,26 @@ class UserStore {
             );
             const sender = senderResponse.data;
 
-            // Добавляем сообщение к входящим сообщениям получателя
             if (!receiver.incomingMessages) {
                 receiver.incomingMessages = [];
             }
             receiver.incomingMessages.push(message);
 
-            // Добавляем сообщение к исходящим сообщениям отправителя
             if (!sender.outgoingMessages) {
                 sender.outgoingMessages = [];
             }
             sender.outgoingMessages.push(message);
 
-            // Обновляем данные получателя на сервере
             await axios.patch(`${API_URL}/users/${receiverId}`, receiver);
-
-            // Обновляем данные отправителя на сервере
             await axios.patch(`${API_URL}/users/${senderId}`, sender);
 
             // Обновляем данные пользователя в хранилище, если отправитель - текущий пользователь
-            if (senderId === this.user!.id) {
-                this.user = sender;
-                localStorage.setItem('user', JSON.stringify(sender));
-            }
+            runInAction(() => {
+                if (senderId === this.user!.id) {
+                    this.user = sender;
+                    localStorage.setItem('user', JSON.stringify(sender));
+                }
+            });
 
             return message;
         } catch (error) {

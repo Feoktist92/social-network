@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Tabs, List, Avatar, TabsProps } from 'antd';
-import userStore from '../stores/UserStore/UserStore';
+import userStore from '../stores/UserStore';
 import { Message, User } from '../types';
-import { getUserById } from '../api/api'; // Подставьте путь к функции загрузки пользователя
+import { getUserById } from '../api/api';
+import { observer } from 'mobx-react-lite';
 
-const MessageList = () => {
+const MessageList = observer(() => {
     const { user } = userStore;
     const [incomingMessages, setIncomingMessages] = useState<Message[]>([]);
     const [outgoingMessages, setOutgoingMessages] = useState<Message[]>([]);
     const [usersMap, setUsersMap] = useState<{ [key: number]: User }>({});
 
     useEffect(() => {
+        // Загрузка входящих и исходящих сообщений пользователя
         const loadIncomingMessages = async () => {
             if (user?.incomingMessages) {
                 setIncomingMessages(user.incomingMessages);
@@ -23,9 +25,9 @@ const MessageList = () => {
             }
         };
 
-        // Создаем отображение идентификаторов пользователей и их данных
-        const loadUsers = async () => {
-            const users: { [key: number]: User } = [];
+        // Загрузка пользователей отправителей и получателей
+        const loadUsersAndMessages = async () => {
+            const users: { [key: number]: User } = {};
 
             if (user?.incomingMessages) {
                 for (const message of user.incomingMessages) {
@@ -48,7 +50,7 @@ const MessageList = () => {
 
         loadIncomingMessages();
         loadOutgoingMessages();
-        loadUsers();
+        loadUsersAndMessages();
     }, [user]);
 
     const items: TabsProps['items'] = [
@@ -93,6 +95,6 @@ const MessageList = () => {
     ];
 
     return <Tabs items={items} />;
-};
+});
 
 export default MessageList;

@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { Form, Button, Input, message } from 'antd';
-import userStore from '../stores/UserStore/UserStore';
-import newsStore from '../stores/NewsStore/NewsStore';
+import userStore from '../stores/UserStore';
+import newsStore from '../stores/NewsStore';
 
 const { TextArea } = Input;
 

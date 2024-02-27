@@ -52,15 +52,15 @@ button:focus-visible {
 
 .user-list__add-button-text,
 .user-list__remove-button-text {
-    @media (max-width: 480px) {
+    @media (max-width: 680px) {
         display: none !important;
     }
 }
 
-.user-list__add-icon,
-.user-list__remove-icon {
-    @media (max-width: 480px) {
-        margin-inline-end: 0;
+.user-list__add-button > span,
+.user-list__remove-button > span {
+    @media (max-width: 680px) {
+        margin-inline-end: 0 !important;
     }
 }
 
@@ -103,6 +103,10 @@ button:focus-visible {
 .news-feed__edit-comment-button {
     margin-left: auto;
     margin-right: 5px;
+}
+
+.news-feed__comments-list {
+    margin-left: 10px;
 }
 
 .friend-list__title {

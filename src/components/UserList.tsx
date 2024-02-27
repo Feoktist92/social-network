@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { Input, Button, List, message } from 'antd';
 import { SearchOutlined, UserAddOutlined, UserDeleteOutlined } from '@ant-design/icons';
 import { getUsers } from '../api/api';
-import userStore from '../stores/UserStore/UserStore';
+import userStore from '../stores/UserStore';
 import { User } from '../types';
 
 const UserList = observer(() => {
@@ -68,14 +68,15 @@ const UserList = observer(() => {
                         key={user.id}
                         actions={[
                             <Button
-
-                                icon={<UserAddOutlined className='user-list__add-icon' />}
+                                className='user-list__add-button'
+                                icon={<UserAddOutlined />}
                                 onClick={() => handleAddFriend(user.id)}
                             >
                                 <span className='user-list__add-button-text'>Добавить</span>
                             </Button>,
                             <Button
-                                icon={<UserDeleteOutlined className='user-list__remove-icon' />}
+                                className='user-list__remove-button'
+                                icon={<UserDeleteOutlined />}
                                 onClick={() => handleRemoveFriend(user.id)}
                             >
                                 <span className='user-list__remove-button-text'>Удалить</span>

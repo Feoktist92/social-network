@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { List, Avatar, Button, message, Input } from 'antd';
 import { MessageOutlined } from '@ant-design/icons';
-import userStore from '../stores/UserStore/UserStore';
+import userStore from '../stores/UserStore';
 import { getUserById } from '../api/api';
 import { User } from '../types';
+import { observer } from 'mobx-react-lite';
 
 const { TextArea } = Input;
 
-const FriendList = () => {
+const FriendList = observer(() => {
     const { user: loggedInUser, sendMessage } = userStore;
     const [userFriends, setUserFriends] = useState<User[]>([]);
     const [isSendingMessage, setIsSendingMessage] = useState(false);
@@ -93,5 +94,5 @@ const FriendList = () => {
             )}
         />
     );
-};
+});
 export default FriendList;

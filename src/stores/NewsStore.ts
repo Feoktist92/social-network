@@ -1,7 +1,7 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import axios from 'axios';
-import { Post, Comment } from '../../types';
-import { API_URL } from '../../api/api';
+import { Post, Comment } from '../types';
+import { API_URL } from '../api/api';
 
 class NewsStore {
     news: Post[] = [];
@@ -10,28 +10,31 @@ class NewsStore {
         makeAutoObservable(this);
     }
 
+    // Загрузка новостей c сервера
     async fetchNews() {
         try {
             const response = await axios.get(API_URL + '/newsfeed');
-            this.news = response.data;
+            runInAction(() => {
+                this.news = response.data;
+            });
         } catch (error) {
             console.error('Error fetching news:', error);
         }
     }
 
+    // Найти комментарий по ID поста и ID комментария
     findCommentById(
         postItemId: number,
         commentId: number
     ): Comment | undefined {
-        const post = this.news.find((post) => post.id === postItemId);
-        if (post) {
-            return post.comments.find((comment) => comment.id === commentId);
-        }
-        return undefined;
+        return this.news
+            .find((post) => post.id === postItemId)
+            ?.comments.find((comment) => comment.id === commentId);
     }
 
-    addCommentLocally(newsItemId: number, comment: string, author: string) {
-        const newsItem = this.news.find((item) => item.id === newsItemId);
+    // Добавление комментария по ID поста
+    addCommentLocally(postId: number, comment: string, author: string) {
+        const newsItem = this.news.find((item) => item.id === postId);
         if (newsItem) {
             const newComment: Comment = {
                 id: newsItem.comments.length + 1,
@@ -43,6 +46,7 @@ class NewsStore {
         }
     }
 
+    // Редактирование комментария по ID поста и ID комментария
     editCommentLocally(postId: number, commentId: number, newContent: string) {
         const post = this.news.find((post) => post.id === postId);
         if (post) {
@@ -55,6 +59,7 @@ class NewsStore {
         }
     }
 
+    // Удаление комментария по ID поста и ID комментария
     deleteCommentLocally(postItemId: number, commentId: number) {
         const post = this.news.find((item) => item.id === postItemId);
         if (post) {
@@ -64,13 +69,16 @@ class NewsStore {
         }
     }
 
+    // Обновление новостей на сервере
     async updateNews() {
         try {
             const response = await axios.patch(
                 API_URL + '/newsfeed',
                 this.news
             );
-            this.news = response.data;
+            runInAction(() => {
+                this.news = response.data;
+            })
         } catch (error) {
             console.error('Error updating news:', error);
         }

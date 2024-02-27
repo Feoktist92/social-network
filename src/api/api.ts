@@ -19,7 +19,6 @@ export const getUserById = async (userId: number) => {
         const users = response.data;
         const user = users.find((user: User) => user.id === userId);
 
-        // Если пользователь найден, возвращаем его данные
         if (user) {
             return user;
         } else {

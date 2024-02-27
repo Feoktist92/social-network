@@ -3,9 +3,10 @@ import { List, Card, Button, Popconfirm, Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { EditOutlined, CloseCircleOutlined, CheckOutlined } from '@ant-design/icons'; // Импортируем иконки
 import CommentForm from './CommentForm';
-import newsStore from '../stores/NewsStore/NewsStore';
+import newsStore from '../stores/NewsStore';
+import userStore from '../stores/UserStore';
+
 import { Comment, Post } from '../types';
-import userStore from '../stores/UserStore/UserStore';
 
 const NewsFeed = observer(() => {
     const { user } = userStore;
@@ -48,7 +49,7 @@ const NewsFeed = observer(() => {
             renderItem={(post: Post) => (
                 <List.Item key={post.id}>
                     <Card title={post.title}>{post.content}</Card>
-                    <List
+                    <List className='news-feed__comments-list'
                         dataSource={post.comments}
                         renderItem={(comment: Comment) => (
                             <List.Item key={comment.id}>
